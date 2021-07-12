@@ -4,25 +4,23 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.viewModels
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.motoka64.barometer.database.BarometricData
 import com.motoka64.barometer.logger.BarometricLogJobService
 import com.motoka64.barometer.logger.PressureSensorLogger
 import com.motoka64.barometer.viewmodel.BarometerViewModel
 import com.motoka64.barometer.viewmodel.BarometerViewModelFactory
-import com.motoka64.barometer.viewmodel.PressureListAdapter
 
 class MainActivity : AppCompatActivity() {
     private val barometricJob by lazy {
@@ -45,17 +43,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        if (jobScheduler.getPendingJob(BAROMETRIC_JOB_ID) == null) {
-            jobScheduler.schedule(barometricJob)
-        }
+        if (savedInstanceState == null) {
+            val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            if (jobScheduler.getPendingJob(BAROMETRIC_JOB_ID) == null) {
+                jobScheduler.schedule(barometricJob)
+            }
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-        val navController = navHostFragment.navController
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        barometerViewModel.let {  }
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.alert_whitelist_title)
+                    .setMessage(R.string.alert_whitelist_text)
+                    .setPositiveButton(R.string.ok){ _, _ ->
+                        val intent = Intent()
+                        intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                        startActivity(intent)
+                    }
+                    .create()
+                    .show()
+            }
+
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
+            val navController = navHostFragment.navController
+            appBarConfiguration = AppBarConfiguration(navController.graph)
+            setupActionBarWithNavController(navController, appBarConfiguration)
+            barometerViewModel.let { }
+        }
     }
 
     override fun onResume() {
