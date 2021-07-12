@@ -8,6 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,24 +39,23 @@ class MainActivity : AppCompatActivity() {
         BarometerViewModelFactory((application as BarometerApplication).repository)
     }
 
+    private lateinit var appBarConfiguration: AppBarConfiguration
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
-        val adapter = PressureListAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-
-        barometerViewModel.allData.observe(this) { list ->
-            adapter.submitList(list)
-        }
 
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         if (jobScheduler.getPendingJob(BAROMETRIC_JOB_ID) == null) {
             jobScheduler.schedule(barometricJob)
         }
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
+        val navController = navHostFragment.navController
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        barometerViewModel.let {  }
     }
 
     override fun onResume() {
@@ -59,6 +64,11 @@ class MainActivity : AppCompatActivity() {
         pressureSensorLogger.getPressure { pressure ->
             barometerViewModel.insert(BarometricData.fromFloat(pressure))
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.main_nav_host)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     companion object {

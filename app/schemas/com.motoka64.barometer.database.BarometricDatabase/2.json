@@ -1,0 +1,46 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "111c2b80de0a00591fb3fe61af630d6c",
+    "entities": [
+      {
+        "tableName": "barometric_data",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`unix_timestamp` INTEGER NOT NULL, `pressure` REAL NOT NULL, `methods` INTEGER NOT NULL, PRIMARY KEY(`unix_timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "unixTimestamp",
+            "columnName": "unix_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pressure",
+            "columnName": "pressure",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedMethod",
+            "columnName": "methods",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "unix_timestamp"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '111c2b80de0a00591fb3fe61af630d6c')"
+    ]
+  }
+}

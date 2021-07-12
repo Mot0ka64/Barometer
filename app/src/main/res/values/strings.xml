@@ -2,4 +2,6 @@
     <string name="app_name">Barometer</string>
     <string name="pressure_separator">:</string>
     <string name="pressure_format_string">%.1f hPa</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_show_log">Show logs.</string>
 </resources>
