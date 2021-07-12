@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BarometricLogJobService"
+        <service android:name=".logger.BarometricLogJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 

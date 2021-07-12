@@ -1,4 +1,4 @@
-package com.motoka64.barometer
+package com.motoka64.barometer.database
 
 import androidx.annotation.WorkerThread
 import com.motoka64.barometer.database.BarometricData
