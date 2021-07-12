@@ -24,11 +24,13 @@ class PressureListAdapter :
     class PressureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val timestamp: TextView = itemView.findViewById(R.id.pressure_timestamp)
         private val pressure: TextView = itemView.findViewById(R.id.pressure_value)
+        private val methods: TextView = itemView.findViewById(R.id.pressure_methods)
 
         fun bind(data: BarometricData) {
             timestamp.text = data.getDate().toString()
             pressure.text =
                 itemView.context.getString(R.string.pressure_format_string).format(data.pressure)
+            methods.text = data.fetchedMethod.toString()
         }
 
         companion object {
